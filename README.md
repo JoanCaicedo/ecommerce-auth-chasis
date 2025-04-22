@@ -41,9 +41,10 @@ Listo para pruebas con JUnit 5 + Mockito
 
 🚀 Ventajas
 ✅ Evita duplicar estructuras entre microservicios.
-
 ✅ Aplica principios SOLID desde la base.
-
 ✅ Permite escalar fácilmente nuevas funcionalidades.
-
 ✅ Ideal para desarrollar microservicios como: auth, user, product, order, etc.
+
+HELPS:
+-Para alzar la imagen docker de la DB: usar el "cd .." para llegar a la carpeta actual. En la terminal del back corre este comando "docker-compose -f docker-file-postgresql.yml up -d".
+
