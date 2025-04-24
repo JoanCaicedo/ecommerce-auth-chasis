@@ -1,14 +1,17 @@
-package com.ecommerce.back.adapters.rest;
+package com.ecommerce.back.adapters.rest.controller;
 
 import com.ecommerce.back.adapters.rest.dto.BaseReferenceRequestDTO;
 import com.ecommerce.back.adapters.rest.dto.BaseReferenceResponseDTO;
 import com.ecommerce.back.adapters.rest.mapper.BaseReferenceMapper;
 import com.ecommerce.back.application.service.BaseReferenceService;
 import com.ecommerce.back.domain.model.BaseReference;
+import com.ecommerce.back.shared.validation.RequestValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -34,10 +37,24 @@ public class BaseReferenceController {
     }
 
     @PostMapping
-    public BaseReferenceResponseDTO create(@RequestBody BaseReferenceRequestDTO request) {
-        BaseReference model = BaseReferenceMapper.toModel(request);
-        BaseReference saved = service.create(model);
-        return BaseReferenceMapper.toResponseDTO(saved);
+    public ResponseEntity<?> create(@RequestBody BaseReferenceRequestDTO request) {
+        try {
+            RequestValidator validator = new RequestValidator();
+            validator.validate(request.getName(), "name")
+                    .isEmpty()
+                    .maxLength();
+
+            if (!validator.getError().isEmpty()) {
+                throw new RuntimeException(validator.getError());
+            }
+
+            BaseReference model = BaseReferenceMapper.toModel(request);
+            BaseReference saved = service.create(model);
+            return ResponseEntity.ok(BaseReferenceMapper.toResponseDTO(saved));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")

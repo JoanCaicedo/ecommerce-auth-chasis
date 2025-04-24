@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public class BaseReference {
 
-    private long id;
+    private Long id;
     private String name;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

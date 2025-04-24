@@ -12,7 +12,6 @@ public class BaseReferenceMapper {
 
         return BaseReference.builder()
                 .name(dto.getName())
-                .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now()).build();
     }
 
