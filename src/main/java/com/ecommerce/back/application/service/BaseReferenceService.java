@@ -4,6 +4,7 @@ package com.ecommerce.back.application.service;
 import com.ecommerce.back.domain.model.BaseReference;
 import com.ecommerce.back.domain.ports.BaseReferenceRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,15 @@ public class BaseReferenceService {
         baseReference.setCreatedAt(java.time.LocalDateTime.now());
         baseReference.setUpdatedAt(java.time.LocalDateTime.now());
         return repository.save(baseReference);
+    }
+
+    public BaseReference update(BaseReference baseReference) {
+        BaseReference toUpdate = findById(baseReference.getId())
+                .orElseThrow(() -> new RuntimeException("Id not found"));
+
+        toUpdate.setName(baseReference.getName());
+        toUpdate.setUpdatedAt(java.time.LocalDateTime.now());
+        return repository.save(toUpdate);
     }
 
     public List<BaseReference> findAll() {

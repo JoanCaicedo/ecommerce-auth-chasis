@@ -57,6 +57,23 @@ public class BaseReferenceController {
         }
     }
 
+    @PutMapping("/{id}")
+    public BaseReferenceResponseDTO update(@PathVariable Long id, @RequestBody BaseReferenceRequestDTO request) {
+        RequestValidator validator = new RequestValidator();
+
+        validator.validate(request.getName(), "name")
+                .isEmpty()
+                .maxLength();
+        if (!validator.getError().isEmpty()) {
+            throw new RuntimeException(validator.getError());
+        }
+
+        BaseReference updatedModel = BaseReferenceMapper.toModel(request);
+        updatedModel.setId(id);
+        BaseReference updated = service.update(updatedModel);
+        return BaseReferenceMapper.toResponseDTO(updated);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
