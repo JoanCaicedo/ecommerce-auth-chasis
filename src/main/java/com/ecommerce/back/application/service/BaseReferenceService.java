@@ -21,6 +21,15 @@ public class BaseReferenceService {
         return repository.save(baseReference);
     }
 
+    public BaseReference update(BaseReference baseReference) {
+        BaseReference toUpdate = findById(baseReference.getId())
+                .orElseThrow(() -> new RuntimeException("Id not found"));
+
+        toUpdate.setName(baseReference.getName());
+        toUpdate.setUpdatedAt(java.time.LocalDateTime.now());
+        return repository.save(toUpdate);
+    }
+
     public List<BaseReference> findAll() {
         return repository.findAll();
     }
