@@ -7,6 +7,7 @@ import com.ecommerce.back.application.service.BaseReferenceService;
 import com.ecommerce.back.domain.model.BaseReference;
 import com.ecommerce.back.shared.validation.RequestValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,11 +31,19 @@ public class BaseReferenceController {
     }
 
     @GetMapping("/{id}")
-    public BaseReferenceResponseDTO findById(@PathVariable Long id) {
-        return service.findById(id)
-                .map(BaseReferenceMapper::toResponseDTO)
-                .orElseThrow(()-> new RuntimeException("Not found"));
+    public ResponseEntity<?> findById(@PathVariable Long id) {
+        try {
+            BaseReference baseReference = service.findById(id)
+                    .orElseThrow(() -> new RuntimeException("BaseReference with id " + id + " not found"));
+
+            BaseReferenceResponseDTO response = BaseReferenceMapper.toResponseDTO(baseReference);
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
+
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody BaseReferenceRequestDTO request) {
@@ -50,7 +59,7 @@ public class BaseReferenceController {
 
             BaseReference model = BaseReferenceMapper.toModel(request);
             BaseReference saved = service.create(model);
-            return ResponseEntity.ok(BaseReferenceMapper.toResponseDTO(saved));
+            return ResponseEntity.status(HttpStatus.CREATED).body(BaseReferenceMapper.toResponseDTO(saved));
 
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -58,25 +67,44 @@ public class BaseReferenceController {
     }
 
     @PutMapping("/{id}")
-    public BaseReferenceResponseDTO update(@PathVariable Long id, @RequestBody BaseReferenceRequestDTO request) {
-        RequestValidator validator = new RequestValidator();
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BaseReferenceRequestDTO request) {
+        try {
+            BaseReference existing = service.findById(id)
+                    .orElseThrow(() -> new RuntimeException("BaseReference with id " + id + " not found"));
 
-        validator.validate(request.getName(), "name")
-                .isEmpty()
-                .maxLength();
-        if (!validator.getError().isEmpty()) {
-            throw new RuntimeException(validator.getError());
+            RequestValidator validator = new RequestValidator();
+            validator.validate(request.getName(), "name")
+                    .isEmpty()
+                    .maxLength();
+
+            if (!validator.getError().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", validator.getError()));
+            }
+
+            BaseReference updatedModel = BaseReferenceMapper.toModel(request);
+            updatedModel.setId(existing.getId());
+            BaseReference updated = service.update(updatedModel);
+
+            return ResponseEntity.ok(BaseReferenceMapper.toResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
         }
-
-        BaseReference updatedModel = BaseReferenceMapper.toModel(request);
-        updatedModel.setId(id);
-        BaseReference updated = service.update(updatedModel);
-        return BaseReferenceMapper.toResponseDTO(updated);
     }
 
+
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            service.findById(id)
+                    .orElseThrow(() -> new RuntimeException("BaseReference with id " + id + " not found"));
+
+            service.delete(id);
+            return ResponseEntity.noContent().build();
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+        }
     }
 }
 
