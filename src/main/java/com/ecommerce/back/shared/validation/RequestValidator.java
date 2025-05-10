@@ -51,7 +51,7 @@ public class RequestValidator {
 
         public RequestValidator isValidEmail() {
             String email = data.get("data");
-            String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            String regex = "^[a-zA-Z0-9](?:[a-zA-Z0-9._-]*[a-zA-Z0-9])?@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
             if (email == null || !Pattern.matches(regex,email)) {
                 error = String.format("%s is not a valid email", data.get("paramName"));
             }
