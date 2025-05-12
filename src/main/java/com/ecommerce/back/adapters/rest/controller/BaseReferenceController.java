@@ -6,6 +6,7 @@ import com.ecommerce.back.adapters.rest.mapper.BaseReferenceMapper;
 import com.ecommerce.back.application.service.BaseReferenceService;
 import com.ecommerce.back.domain.model.BaseReference;
 import com.ecommerce.back.shared.exceptions.GeneralException;
+import com.ecommerce.back.shared.logging.GeneralLogsImpl;
 import com.ecommerce.back.shared.validation.RequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
